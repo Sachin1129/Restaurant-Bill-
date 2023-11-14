@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restuarent Bill</title>
+    <link rel="stylesheet" href="C:\Users\v-sachin.sharma\sharpner.css">
+</head>
+
+<body>
+    <form id="form">
+        <label for="name">Choose Price</label>
+        <input type="text" id="name">
+        <label for="description"> Choose Dish</label>
+        <input type="text" id="description">
+        <label for="category">Choose a Table</label>
+        <select id="select">
+            <option value="Table 1"><b>Table 1</b></option>
+            <option value="Table 2"><b>Table 2</b></option>
+            <option value="Table 3"><b>Table 3</b></option>
+        </select>
+        <button type="submit" value="Submit">Add to bill</button>
+    </form>
+    <div id="display"></div>
+
+    <script>
+        document.getElementById("form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            // Get values from the form
+            var name = document.getElementById("name").value;
+            var description = document.getElementById("description").value;
+            var select = document.getElementById("select").value;
+
+            // Prepare the data to be sent to crudcrud
+            var orderData = {
+                name: name,
+                description: description,
+                table: select
+            };
+
+            // Make a POST request to crudcrud to create a new order
+            fetch('https://crudcrud.com/api/1534154f35004111a5c49a69604073bf/Restuarent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Display the data on the screen
+                    displayOrders();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+
+        // Retrieve data from crudcrud on page load
+        window.addEventListener("load", function () {
+            displayOrders();
+        });
+
+        // Function to display orders
+        function displayOrders() {
+            var displaydata = document.getElementById("display");
+            displaydata.innerHTML = '<h1><b>Orders</b></h1>';
+
+            // Make a GET request to crudcrud to retrieve all orders
+            fetch('https://crudcrud.com/api/1534154f35004111a5c49a69604073bf/Restuarent')
+                .then(response => response.json())
+                .then(data => {
+                    // Iterate through the retrieved data and display orders
+                    data.forEach(order => {
+                        displaydata.innerHTML += '<b>' + order.table;
+                        displaydata.innerHTML += '<p>' + order.name + ' - ' + order.table + ' - ' + order.description +
+                            ' <button onclick="deleteData(\'' + order._id + '\')">Delete Order</button></p>';
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // Function to delete data
+        function deleteData(id) {
+            // Make a DELETE request to crudcrud to delete the order with the specified id
+            fetch(`https://crudcrud.com/api/1534154f35004111a5c49a69604073bf/Restuarent/${id}`, {
+                method: 'DELETE',
+            })
+            .then(() => {
+                displayOrders();  // Corrected from displayData() to displayOrders()
+            });
+        }
+    </script>
+</body>
+
+</html>
